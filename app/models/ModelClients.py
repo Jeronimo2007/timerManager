@@ -23,3 +23,42 @@ def read_clients():
 
     return response.data
 
+
+
+def update_client(client_id: int, name: str = None, color: str = None):
+    
+    
+    update_data = {}
+    if name is not None:
+        update_data['name'] = name
+    if color is not None:
+        update_data['color'] = color
+    
+    
+    if not update_data:
+        return {"error": "No se proporcionaron datos para actualizar"}
+    
+    try:
+        response = supabase.table('clients')\
+            .update(update_data)\
+            .eq('id', client_id)\
+            .execute()
+        
+        if response.data:
+            return {
+                "message": "Cliente actualizado exitosamente",
+                "client": response.data[0]
+            }
+        else:
+            return {
+                "error": "Error al actualizar el cliente",
+                "details": response.error
+            }
+    except Exception as e:
+        return {
+            "error": "Error al actualizar el cliente",
+            "details": str(e)
+        }
+    
+
+

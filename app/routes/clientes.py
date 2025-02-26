@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from pydantic import BaseModel
 
-from app.models.ModelClients import create_client, read_clients
+from app.models.ModelClients import create_client, read_clients, update_client
 from app.services.utils import payload, role_required
 
 
@@ -14,6 +14,16 @@ class clientCreate(BaseModel):
     name: str
     color: str
 
+
+class clientUpdate(BaseModel):
+    id: int
+    name: str
+    color: str
+
+
+
+class clientDelete(BaseModel):
+    id: int
 
 
 @router.post('/create')
@@ -54,6 +64,28 @@ async def get_clients_admin(user: dict = Depends(role_required(['socio', 'senior
     response = read_clients()
 
     return response
+
+
+@router.put('/update_client')
+async def client_update(update_data: clientUpdate, user: dict = Depends(role_required(['socio', 'senior'])), token: str = Depends(oauth2_scheme)):
+
+
+    """update the clients info"""
+
+
+    user_data = payload(token)
+
+
+    if not user_data:
+        raise HTTPException(status_code=401, detail="Usuario no autenticado")
+
+
+    response = update_client(update_data.id ,update_data.name, update_data.color)
+
+
+    return response
+
+
 
 
 
