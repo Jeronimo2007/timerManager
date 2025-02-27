@@ -64,14 +64,7 @@ def update_client(client_id: int, name: str = None, color: str = None):
 
 def remove_client(id:int):
     
-
     try:
-        response_tasks = supabase.table('tasks').delete().eq('client_id', id).execute()
-
-        if not response_tasks:
-            return {
-                'error': 'error al eliminar tareas'
-            }
         
         response_client = supabase.table('clients').delete().eq('id', id).execute()
 

@@ -40,3 +40,23 @@ class TaskResponse(BaseModel):
     assignment_date: datetime
     due_date: Optional[datetime]
     total_time: float
+
+
+class TimeEntryCreate(BaseModel):
+    task_id: int
+    start_time: datetime
+    end_time: datetime
+
+
+class TimeEntryUpdate(BaseModel):
+    start_time: Optional[datetime] = None
+    end_time: Optional[datetime] = None
+
+
+class TimeEntryResponse(BaseModel):
+    id: int
+    task_id: int
+    user_id: int
+    start_time: datetime
+    end_time: datetime
+    duration: float
