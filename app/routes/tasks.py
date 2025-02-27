@@ -1,9 +1,9 @@
 from fastapi import APIRouter, HTTPException, Depends
 from typing import List
 from fastapi.security import OAuth2PasswordBearer
-from app.models.ModelTasks import create_task, delete_task, get_all_tasks, get_task, update_task
+from app.models.ModelTasks import create_task, delete_task, get_all_tasks, get_tasks_by_user_id, update_task
 from app.schemas.schemas import TaskCreate, TaskResponse, TaskUpdate
-from app.services.utils import payload, role_required
+from app.services.utils import get_current_user, payload, role_required
 
 
 router = APIRouter(prefix="/tasks", tags=["tasks"])
@@ -44,25 +44,18 @@ async def get_tasks_endpoint( token: str = Depends(oauth2_scheme)):
     return get_all_tasks()
 
 
-@router.get("/{task_id}", response_model=TaskResponse)
-async def get_task_endpoint(task_id: int , token: str = Depends(oauth2_scheme)):
+@router.get("/get_tasks_by_user")
+async def get_task_endpoint(token: str = Depends(oauth2_scheme)):
 
-    """ get a task by the id """
+    """ get a task by the user id """
 
     user_data = payload(token)
-        
-
-    if not user_data or "id" not in user_data:
-        raise HTTPException(status_code=401, detail="Usuario no autenticado")
-
-
-    task = get_task(task_id)
-
-    if not task:
-
-        raise HTTPException(status_code=404, detail="Tarea no encontrada")
     
-    return task
+    if not user_data or "id" not in user_data:
+
+        raise HTTPException(status_code=401, detail="Usuario no autenticado")
+    
+    return get_tasks_by_user_id(user_data["id"])
 
 
 @router.put("/{task_id}", response_model=TaskResponse)

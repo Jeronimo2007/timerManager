@@ -2,7 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from pydantic import BaseModel
 
-from app.models.ModelClients import create_client, read_clients, update_client
+from app.models.ModelClients import create_client, read_clients, remove_client, update_client
+from app.schemas.schemas import clientCreate, clientDelete, clientUpdate
 from app.services.utils import payload, role_required
 
 
@@ -10,20 +11,7 @@ router = APIRouter(prefix="/clients", tags=["clients"])
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/users/login")
 
-class clientCreate(BaseModel):
-    name: str
-    color: str
 
-
-class clientUpdate(BaseModel):
-    id: int
-    name: str
-    color: str
-
-
-
-class clientDelete(BaseModel):
-    id: int
 
 
 @router.post('/create')
@@ -81,6 +69,25 @@ async def client_update(update_data: clientUpdate, user: dict = Depends(role_req
 
 
     response = update_client(update_data.id ,update_data.name, update_data.color)
+
+
+    return response
+
+
+
+@router.delete('/delete_client')
+async def delete_client(delete_data: clientDelete, user: dict = Depends(role_required(['socio', 'senior'])), token: str = Depends(oauth2_scheme)):
+    
+    """ delete a client with their assigments """
+
+    user_data = payload(token)
+
+
+    if not user_data:
+        raise HTTPException(status_code=401, detail="Usuario no autenticado")
+    
+
+    response = remove_client(delete_data.id)
 
 
     return response

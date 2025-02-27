@@ -2,6 +2,22 @@ from pydantic import BaseModel, Field
 from typing import Optional
 from datetime import datetime
 
+
+class clientCreate(BaseModel):
+    name: str
+    color: str
+
+
+class clientUpdate(BaseModel):
+    name: str
+    color: str
+
+
+
+class clientDelete(BaseModel):
+    id: int
+
+
 class TaskCreate(BaseModel):
     client_id: int
     title: str = Field(..., min_length=3, max_length=255)

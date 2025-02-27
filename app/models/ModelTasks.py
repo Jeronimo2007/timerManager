@@ -40,13 +40,13 @@ def get_all_tasks():
     return response.data if response.data else []
 
 
-def get_task(task_id: int):
+def get_tasks_by_user_id(user_id: int):
 
-    """ get a task by id """
+    """ get a task by user id """
 
-    response = supabase.table("tasks").select("*").eq("id", task_id).execute()
+    response = supabase.table("tasks").select("*").eq("assigned_to_id", user_id).execute()
 
-    return response.data[0] if response.data else None
+    return response.data
 
 
 def update_task(task_id: int, task_data: TaskUpdate):
@@ -69,7 +69,7 @@ def update_task(task_id: int, task_data: TaskUpdate):
 def delete_task(task_id: int):
 
     """ remove a tasks """
-    
+
     response = supabase.table("tasks").delete().eq("id", task_id).execute()
 
     if response.data:
