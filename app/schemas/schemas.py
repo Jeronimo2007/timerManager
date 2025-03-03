@@ -60,3 +60,8 @@ class TimeEntryResponse(BaseModel):
     start_time: datetime
     end_time: datetime
     duration: float
+
+
+class ReportRequest(BaseModel):
+    start_date: datetime
+    end_date: datetime
