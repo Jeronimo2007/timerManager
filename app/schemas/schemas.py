@@ -9,6 +9,7 @@ class clientCreate(BaseModel):
 
 
 class clientUpdate(BaseModel):
+    id: int
     name: str
     color: str
 
@@ -63,5 +64,12 @@ class TimeEntryResponse(BaseModel):
 
 
 class ReportRequest(BaseModel):
+    start_date: datetime
+    end_date: datetime
+
+
+
+class ClientReportRequest(BaseModel):
+    client_id: int
     start_date: datetime
     end_date: datetime
