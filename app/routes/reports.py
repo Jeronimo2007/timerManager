@@ -68,7 +68,7 @@ async def get_hours_by_client(
     report_data = []
     for client_id, data in client_hours.items():
         client_name = client_dict.get(client_id, "Desconocido")
-        total_hours = round(data["total_hours"], 2)
+        total_hours = round(data["total_hours"], 2) 
         
         tasks = [{"Título": title, "Horas": round(hours, 2)} 
                  for title, hours in data["tasks"].items()]

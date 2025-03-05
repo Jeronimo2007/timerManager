@@ -40,7 +40,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
         data={"sub": user["id"], "role": user["role"]}
     )
 
-    return {"access_token": access_token, "token_type": "bearer", "role": user["role"]}
+    return {"access_token": access_token, "token_type": "bearer", "role": user["role"],"user_id": user['id'], "username": user['username']}
 
 @router.get("/me", status_code=status.HTTP_200_OK)
 async def read_current_user(user: dict = Depends(get_current_user)):
