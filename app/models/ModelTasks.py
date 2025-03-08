@@ -2,6 +2,8 @@
 
 from datetime import datetime
 from typing import Optional
+
+from fastapi import HTTPException
 from app.database.data import supabase
 
 from app.schemas.schemas import TaskCreate, TaskUpdate
@@ -71,7 +73,7 @@ def update_task(task_id: int, task_data: TaskUpdate):
     task_dict = task_data.dict()
     task_dict["due_date"] = format_datetime(task_data.due_date)
 
-    response = supabase.table("tasks").update(task_data.dict(exclude_unset=True)).eq("id", task_id).execute()
+    response = supabase.table("tasks").update(task_dict).eq("id", task_id).execute()
 
     if response.data:
 
@@ -79,7 +81,7 @@ def update_task(task_id: int, task_data: TaskUpdate):
     
     else:
 
-        return {"error": response.error}
+        raise HTTPException(status_code=400, detail=response.error)
     
 
 def delete_task(task_id: int):
