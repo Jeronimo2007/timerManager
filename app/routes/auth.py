@@ -49,3 +49,13 @@ async def read_current_user(user: dict = Depends(get_current_user)):
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
 
     return {"id": user["id"], "username": user["username"], "role": user["role"]}
+
+
+@router.get("/get_all_users")
+async def read_all_users(user: dict = Depends(get_current_user)):
+    """Get all the users in the database
+    """
+    if not user:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+
+    response = get_all_users()

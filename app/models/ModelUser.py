@@ -31,10 +31,20 @@ def create_user(username: str, password: str, role_code: str):
         return {"error": "Error al crear el usuario", "details": response.error}
 
 def get_user(username: str):
-    """ Obtiene los datos de un usuario por su username """
+    """ get all the data of an user by username """
     response = supabase.table("users").select("id,username, hashed_password,role").eq("username", username).execute()
     if response.data:
         return response.data[0]  
     else:
         return None  
+    
+
+
+def get_all_users():
+    """ get all the users in the database """
+    response = supabase.table("users").select("*").execute()
+    if response.data:
+        return response.data
+    else:
+        return None
 

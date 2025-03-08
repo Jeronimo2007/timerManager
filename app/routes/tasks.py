@@ -12,7 +12,7 @@ router = APIRouter(prefix="/tasks", tags=["tasks"])
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/users/login")
 
 
-@router.post("/", response_model=TaskResponse, dependencies=[Depends(role_required(["socio", "senior", "consultor"]))])
+@router.post("/create", response_model=TaskResponse, dependencies=[Depends(role_required(["socio", "senior", "consultor"]))])
 async def create_task_endpoint(task_data: TaskCreate,  token: str = Depends(oauth2_scheme)):
 
     """ creates a new task """
@@ -29,7 +29,7 @@ async def create_task_endpoint(task_data: TaskCreate,  token: str = Depends(oaut
     return task
 
 
-@router.get("/", response_model=List[TaskResponse])
+@router.get("/get_task")
 async def get_tasks_endpoint( token: str = Depends(oauth2_scheme)):
 
     """ get all the tasks """

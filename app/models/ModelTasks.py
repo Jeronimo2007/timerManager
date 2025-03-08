@@ -32,12 +32,28 @@ def create_task(task_data: TaskCreate):
 
 
 def get_all_tasks():
+    """ get the task with the client and the user assigned """
 
-    """ get all the tasks """
+    response = supabase.table("tasks").select(
+        "id, title, status, client_id, clients(name), assigned_to_id, users(username)"
+    ).execute()
 
-    response = supabase.table("tasks").select("*").execute()
+    if not response.data:
+        return []
 
-    return response.data if response.data else []
+   
+    tasks = [
+        {
+            "id": task["id"],
+            "title": task["title"],
+            "status": task["status"],
+            "client": task["clients"]["name"] if task["clients"] else "Sin Cliente",
+            "assigned_to": task["users"]["username"] if task["users"] else "Sin Asignado"
+        }
+        for task in response.data
+    ]
+
+    return tasks
 
 
 def get_tasks_by_user_id(user_id: int):
