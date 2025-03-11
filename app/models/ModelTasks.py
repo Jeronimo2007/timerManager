@@ -37,7 +37,7 @@ def get_all_tasks():
     """ get the task with the client and the user assigned """
 
     response = supabase.table("tasks").select(
-        "id, title, status, client_id, clients(name), assigned_to_id, users(username)"
+        "id, title, status, due_date, client_id, clients(name), assigned_to_id, users(username)"
     ).execute()
 
     if not response.data:
@@ -49,6 +49,7 @@ def get_all_tasks():
             "id": task["id"],
             "title": task["title"],
             "status": task["status"],
+            "due_date": task["due_date"],
             "client": task["clients"]["name"] if task["clients"] else "Sin Cliente",
             "assigned_to": task["users"]["username"] if task["users"] else "Sin Asignado"
         }
@@ -67,20 +68,27 @@ def get_tasks_by_user_id(user_id: int):
     return response.data
 
 
-def update_task(task_id: int, task_data: TaskUpdate):
 
-    """ update a task by id """
-    task_dict = task_data.dict()
-    task_dict["due_date"] = format_datetime(task_data.due_date)
+def update_task(task_id: int, task_data: TaskUpdate):
+    """ Update a task by id """
+    
+    task_dict = task_data.dict(exclude_unset=True)
+
+    
+    if isinstance(task_dict.get("due_date"), str):
+        try:
+            task_dict["due_date"] = datetime.fromisoformat(task_dict["due_date"])
+        except ValueError:
+            raise HTTPException(status_code=400, detail="Formato de fecha inválido. Usa ISO 8601 (YYYY-MM-DDTHH:MM:SS).")
+
+   
+    task_dict["due_date"] = format_datetime(task_dict["due_date"])
 
     response = supabase.table("tasks").update(task_dict).eq("id", task_id).execute()
 
     if response.data:
-
-        return response.data[0]
-    
+        return response.data
     else:
-
         raise HTTPException(status_code=400, detail=response.error)
     
 

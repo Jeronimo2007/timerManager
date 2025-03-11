@@ -22,14 +22,15 @@ class clientDelete(BaseModel):
 class TaskCreate(BaseModel):
     client_id: int
     title: str = Field(..., min_length=3, max_length=255)
-    description: Optional[str] = None
+    description: Optional[str] 
     assigned_to_id: int
     due_date: datetime
 
 class TaskUpdate(BaseModel):
     description: Optional[str] = None
     status: Optional[str] = None
-    due_date: Optional[datetime] = None
+    assigned_to_id: Optional[int] = None
+    due_date: Optional[str] = None
 
 class TaskResponse(BaseModel):
     id: int
@@ -50,8 +51,8 @@ class TimeEntryCreate(BaseModel):
 
 
 class TimeEntryUpdate(BaseModel):
-    start_time: Optional[datetime] = None
-    end_time: Optional[datetime] = None
+    start_time: Optional[datetime] 
+    end_time: Optional[datetime] 
 
 
 class TimeEntryResponse(BaseModel):
@@ -71,5 +72,10 @@ class ReportRequest(BaseModel):
 
 class ClientReportRequest(BaseModel):
     client_id: int
+    start_date: datetime
+    end_date: datetime
+
+
+class ClientReportRequestTimeEntries(BaseModel):
     start_date: datetime
     end_date: datetime

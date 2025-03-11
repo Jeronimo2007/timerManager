@@ -58,7 +58,7 @@ async def get_task_endpoint(token: str = Depends(oauth2_scheme)):
     return get_tasks_by_user_id(user_data["id"])
 
 
-@router.put("/{task_id}", response_model=TaskResponse)
+@router.put("/{task_id}")
 async def update_task_endpoint(task_id: int, task_data: TaskUpdate, user : dict = Depends(role_required(["socio", "senior", "consultor"])), token: str = Depends(oauth2_scheme)):
 
     """  update a tasks """
@@ -79,7 +79,7 @@ async def update_task_endpoint(task_id: int, task_data: TaskUpdate, user : dict 
     return task
 
 
-@router.delete("/{task_id}", dependencies=[Depends(role_required(["socio", "senior"]))])
+@router.delete("/delete/{task_id}", dependencies=[Depends(role_required(["socio", "senior"]))])
 async def delete_task_endpoint(task_id: int, token: str = Depends(oauth2_scheme)):
 
     """ delete a task """

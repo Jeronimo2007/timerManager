@@ -4,7 +4,7 @@ from pydantic import BaseModel
 from typing import List
 from datetime import datetime
 from app.database.data import supabase
-from app.schemas.schemas import ClientReportRequest, ReportRequest
+from app.schemas.schemas import ClientReportRequest, ClientReportRequestTimeEntries, ReportRequest
 from app.services.utils import role_required
 import pandas as pd
 import io
@@ -299,3 +299,56 @@ async def download_client_report(
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         headers={"Content-Disposition": f"attachment; filename=reporte_cliente_{client_name}_{request.start_date.date()}_{request.end_date.date()}.xlsx"}
     )
+
+
+@router.post("/get_time_entries")
+async def get_time_entries(data: ClientReportRequestTimeEntries, user: dict = Depends(role_required(["socio", "senior", "consultor"]))):
+    """ get the time entries by client """
+
+    try:
+        
+        start_date = data.start_date.strftime("%Y-%m-%d")
+        end_date = data.end_date.strftime("%Y-%m-%d")
+
+       
+        response = (
+            supabase.table("time_entries")
+            .select("start_time, end_time, task_id, tasks(client_id, clients(name))")
+            .gte("start_time", start_date)
+            .lte("start_time", end_date)
+            .execute()
+        )
+
+        if not response.data:
+            return []
+
+        
+        time_entries_by_date = {}
+
+        for entry in response.data:
+            start_time = datetime.fromisoformat(entry["start_time"])
+            end_time = datetime.fromisoformat(entry["end_time"])
+            duration_hours = (end_time - start_time).total_seconds() / 3600
+
+            date_key = start_time.strftime("%Y-%m-%d")
+            client_name = entry["tasks"]["clients"]["name"]
+
+            if date_key not in time_entries_by_date:
+                time_entries_by_date[date_key] = {}
+
+            if client_name not in time_entries_by_date[date_key]:
+                time_entries_by_date[date_key][client_name] = 0
+
+            time_entries_by_date[date_key][client_name] += duration_hours
+
+        
+        result = [
+            {"date": date, "client": client, "hours": hours}
+            for date, clients in time_entries_by_date.items()
+            for client, hours in clients.items()
+        ]
+
+        return result
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al obtener los registros de tiempo: {str(e)}")
