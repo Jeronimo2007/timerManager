@@ -13,6 +13,17 @@ from fastapi.responses import StreamingResponse
 router = APIRouter(prefix="/reports", tags=["Reportes"])
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/users/login")
 
+
+def parse_datetime(date_str):
+    """Parse a datetime string with or without milliseconds."""
+    try:
+        # Try parsing with milliseconds
+        return datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%S.%f")
+    except ValueError:
+        # Fallback to parsing without milliseconds
+        return datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%S")
+
+
 @router.post("/hours_by_client/", response_model=List[dict])
 async def get_hours_by_client(
     request: ReportRequest,
@@ -306,11 +317,9 @@ async def get_time_entries(data: ClientReportRequestTimeEntries, user: dict = De
     """ get the time entries by client """
 
     try:
-        
         start_date = data.start_date.strftime("%Y-%m-%d")
         end_date = data.end_date.strftime("%Y-%m-%d")
 
-       
         response = (
             supabase.table("time_entries")
             .select("start_time, end_time, task_id, tasks(client_id, clients(name))")
@@ -322,12 +331,11 @@ async def get_time_entries(data: ClientReportRequestTimeEntries, user: dict = De
         if not response.data:
             return []
 
-        
         time_entries_by_date = {}
 
         for entry in response.data:
-            start_time = datetime.fromisoformat(entry["start_time"])
-            end_time = datetime.fromisoformat(entry["end_time"])
+            start_time = parse_datetime(entry["start_time"])
+            end_time = parse_datetime(entry["end_time"])
             duration_hours = (end_time - start_time).total_seconds() / 3600
 
             date_key = start_time.strftime("%Y-%m-%d")
@@ -341,7 +349,6 @@ async def get_time_entries(data: ClientReportRequestTimeEntries, user: dict = De
 
             time_entries_by_date[date_key][client_name] += duration_hours
 
-        
         result = [
             {"date": date, "client": client, "hours": hours}
             for date, clients in time_entries_by_date.items()

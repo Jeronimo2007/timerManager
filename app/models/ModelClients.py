@@ -1,4 +1,5 @@
 from app.database.data import supabase
+from app.models.ModelTasks import delete_task
 
 
 
@@ -62,21 +63,27 @@ def update_client(client_id: int, name: str = None, color: str = None):
         }
     
 
-def remove_client(id:int):
-    
+def remove_client(id: int):
     try:
         
         response_client = supabase.table('clients').delete().eq('id', id).execute()
 
         if response_client:
+           
+            response_tasks = supabase.table('tasks').select('id').eq('client_id', id).execute()
+
+            if response_tasks.data:
+                for task in response_tasks.data:
+                    
+                    delete_task(task['id'])
+
             return {
-                'message' : 'eliminado correctamente'
+                'message': 'Cliente y tareas eliminados correctamente'
             }
-
-
 
     except Exception as e:
         return {
-            'error': 'error al eliminar el cliente',
+            'error': 'Error al eliminar el cliente',
             'details': str(e)
         }
+

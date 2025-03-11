@@ -96,6 +96,11 @@ def delete_task(task_id: int):
 
     """ remove a tasks """
 
+    response_time_entries = supabase.table("time_entries").delete().eq("task_id", task_id).execute()
+
+    if not response_time_entries.data:
+        return {"error": response_time_entries.error}
+
     response = supabase.table("tasks").delete().eq("id", task_id).execute()
 
     if response.data:
