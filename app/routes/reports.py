@@ -92,7 +92,7 @@ async def get_hours_by_client(
 
     return report_data
 
-@router.post("/download_report/")
+@router.post("/download_report")
 async def download_report(
     request: ReportRequest,
     user: dict = Depends(role_required(["socio", "senior", "consultor"]))
@@ -175,7 +175,7 @@ async def download_report(
         headers={"Content-Disposition": f"attachment; filename=reporte_horas_{request.start_date.date()}_{request.end_date.date()}.xlsx"}
     )
 
-@router.post("/download_client_report/")
+@router.post("/download_client_report")
 async def download_client_report(
     request: ClientReportRequest,
     user: dict = Depends(role_required(["socio", "senior", "consultor"]))

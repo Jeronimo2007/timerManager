@@ -32,8 +32,11 @@ def update_client(client_id: int, name: str = None, color: str = None):
     update_data = {}
     if name is not None:
         update_data['name'] = name
+
+
     if color is not None:
         update_data['color'] = color
+    
     
     
     if not update_data:

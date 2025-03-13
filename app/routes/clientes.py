@@ -26,7 +26,7 @@ async def addClient(client_data: clientCreate, user: dict = Depends(role_require
         raise HTTPException(status_code=401, detail="Usuario no autenticado")
     
 
-    response = create_client(client_data.name, client_data.color)
+    response = create_client(client_data.name,client_data.color)
 
     if not response:
         raise HTTPException(status_code=500, detail='cannot create client')

@@ -6,12 +6,14 @@ from datetime import datetime
 class clientCreate(BaseModel):
     name: str
     color: str
+    
 
 
 class clientUpdate(BaseModel):
     id: int
     name: str
     color: str
+    
 
 
 
