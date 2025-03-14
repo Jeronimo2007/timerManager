@@ -14,7 +14,7 @@ router = APIRouter(prefix="/timeEntry", tags=["Time Entries"])
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/users/login")
 
 
-@router.post("/", response_model=TimeEntryResponse)
+@router.post("/create", response_model=TimeEntryResponse)
 async def create_time_entry_endpoint(entry_data: TimeEntryCreate, user: dict = Depends(get_current_user)):
 
     """ register the time in a task """
@@ -28,7 +28,7 @@ async def create_time_entry_endpoint(entry_data: TimeEntryCreate, user: dict = D
     return entry
 
 
-@router.get("/", response_model=List[TimeEntryResponse])
+@router.get("/get_all_time_entries", response_model=List[TimeEntryResponse])
 async def get_time_entries_endpoint():
 
     """ get all time entries"""
@@ -36,7 +36,7 @@ async def get_time_entries_endpoint():
     return get_all_time_entries()
 
 
-@router.get("/{entry_id}", response_model=TimeEntryResponse)
+@router.get("/get_time_entry/{entry_id}", response_model=TimeEntryResponse)
 async def get_time_entry_endpoint(entry_id: int):
 
     """ get a time entrie by the id """
@@ -50,7 +50,7 @@ async def get_time_entry_endpoint(entry_id: int):
     return entry
 
 
-@router.put("/{entry_id}", response_model=TimeEntryResponse)
+@router.put("/update/{entry_id}", response_model=TimeEntryResponse)
 async def update_time_entry_endpoint(entry_id: int, entry_data: TimeEntryUpdate):
 
     """ update a time entry"""
@@ -64,7 +64,7 @@ async def update_time_entry_endpoint(entry_id: int, entry_data: TimeEntryUpdate)
     return entry
 
 
-@router.delete("/{entry_id}")
+@router.delete("/delete/{entry_id}")
 async def delete_time_entry_endpoint(entry_id: int):
 
     """ delete a time entry """
