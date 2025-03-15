@@ -75,7 +75,16 @@ def update_time_entry(entry_id: int, entry_data: TimeEntryUpdate):
 def delete_time_entry(entry_id: int):
 
     """ Delete a time Entry """
-
-    response = supabase.table("time_entries").delete().eq("id", entry_id).execute()
-
-    return {"message": "Registro de tiempo eliminado correctamente"} if response.data else {"error": response.error}
+    
+    try:
+        response = supabase.table("time_entries").delete().eq("id", entry_id).execute()
+        return {"message": "Registro de tiempo eliminado correctamente"} if response.data else {"error": response.error}
+    except Exception as e:
+        # Check for the specific "relation task does not exist" error
+        error_message = str(e)
+        if "relation \"task\" does not exist" in error_message:
+            # This most likely means there's a mismatch between table names
+            # Return a more specific error message
+            return {"error": "Error en la configuración de la base de datos: La tabla 'task' no existe. Verifique que el nombre de la tabla sea correcto."}
+        # For any other errors, return the original error
+        return {"error": error_message}
